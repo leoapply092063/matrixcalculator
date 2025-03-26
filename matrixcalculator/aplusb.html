@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <body style="background-color: black; color: white;">
+
+        <meta charset = "UTF-8">
+        <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+        <title> Matrix Operations: C++ & WebAssembly</title>
+        <script src="aplusb.js"></script>
+        <style> 
+            .matrix-grid {
+                display: grid;
+                grid-template-columns: repeat(3,auto);
+            }
+
+            input[type="number"] {
+  width: 80px;
+  padding: 0;
+  margin: 2px;
+  font-size: 10px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+
+            .matrix-box {
+                
+            }
+        </style>
+       </head>
+        <body>
+            <div id="inputs">
+            <input type="number" id="nummats" placeholder="matrices"><br>
+            <input type="number" id="numrows" placeholder="rows" ><br>
+            <input type="number" id="numcols" placeholder="columns" ><br>
+            <button id="genBtn" disabled onclick="generateMatrixInputs()">Generate Matrix Inputs</button>
+            <button id="sendBtn" disabled onclick="sendMatrixToWASM()">Send Matrix to WASM</button>
+            <div id="matrixInputs" class="matrix-grid"></div> 
+            <div id="output" style="min-height: 50px; color: white; background-color: #111;"></div>
+            <div id="resultMatrix" style="min-height: 50px; color: white; background-color: #111; margin-top: 20px;"></div>
+
+            <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Now the script will run only after the HTML is loaded
+            });
+                let processMatrix;
+                Module.onRuntimeInitialized = function () {
+                processMatrix = Module.cwrap('processMatrix', null, ['number', 'number', 'number']);
+                document.getElementById("genBtn").disabled = false;
+                document.getElementById("sendBtn").disabled = false;
+            };
+                    function generateMatrixInputs() {
+                        let matrixDiv = document.createElement("div");                        
+    let mats = parseInt(document.getElementById("nummats").value); // Get number of matrices
+    let rows = parseInt(document.getElementById("numrows").value); // Get number of rows
+    let cols = parseInt(document.getElementById("numcols").value); // Get number of columns
+    let matrixInputsDiv = document.getElementById("matrixInputs"); // Get the div where inputs will go
+    matrixInputsDiv.innerHTML = ""; // Clear previous input fields
+    for (let m = 0; m < mats; m++) { // Loop through each matrix
+        let matrixDiv = document.createElement("div");
+        matrixDiv.innerHTML = `<h3>Matrix ${m + 1}</h3>`; // Title for each matrix
+        for (let r = 0; r < rows; r++) { // Loop through rows
+            let rowDiv = document.createElement("div");
+            for (let c = 0; c < cols; c++) { // Loop through columns
+                let input = document.createElement("input");
+                input.type = "number";
+                input.id = `matrix_${m}_${r}_${c}`;
+                input.placeholder = `M${m} R${r} C${c}`; // Placeholder text
+                rowDiv.appendChild(input); // Append input field to row
+            }
+            matrixDiv.appendChild(rowDiv); // Append row to matrix
+        }
+        matrixInputsDiv.appendChild(matrixDiv); // Append matrix to main div
+    }
+}
+             function sendMatrixToWASM() {
+                console.log("sendMatrixtoWASM function called!");           
+                let mats = parseInt(document.getElementById("nummats").value);
+                let rows = parseInt(document.getElementById("numrows").value);
+                let cols = parseInt(document.getElementById("numcols").value);
+                   let matrixData = [];
+                   for( let m = 0; m< mats; m++){
+                      for(let r = 0; r < rows; r++){
+                        for (let c = 0; c < cols; c++){
+                        let value = parseInt(document.getElementById(`matrix_${m}_${r}_${c}`).value) || 0;
+                        matrixData.push(value);
+                       }
+                     }     
+                }
+                console.log("Sending matrixData:", matrixData);
+                let typedMatrixData = Int32Array.from(matrixData);
+                let bytesPerElement = Int32Array.BYTES_PER_ELEMENT;
+                let buffer = Module._malloc(typedMatrixData.length * bytesPerElement);
+                Module.HEAP32.set(typedMatrixData, buffer >> 2);
+                processMatrix(buffer, typedMatrixData.length, cols);
+                Module._free(buffer);
+            }
+
+                    function displayMatrixOutput(matrix) {
+            let outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = "<h3>Matrix Output:</h3>";
+            let rows = parseInt(document.getElementById("numrows").value);
+            let cols = parseInt(document.getElementById("numcols").value);
+            let index = 0;
+
+            for (let r = 0; r < rows; r++) {
+                let rowText = "";
+                for (let c = 0; c < cols; c++) {
+                    rowText += matrix[index] + " ";
+                    index++;
+                }
+                outputDiv.innerHTML += `<p>${rowText}</p>`;
+            }
+        }
+        // Make functions globally accessible
+window.generateMatrixInputs = generateMatrixInputs;
+window.sendMatrixToWASM = sendMatrixToWASM;
+    </script>
+            </body>
+            </html>
