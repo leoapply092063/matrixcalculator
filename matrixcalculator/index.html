@@ -45,7 +45,7 @@
             });
                 let processMatrix;
                 Module.onRuntimeInitialized = function () {
-                processMatrix = Module.cwrap('processMatrix', null, ['number', 'number', 'number','number']);
+                processMatrix = Module.cwrap('processMatrix', null, ['number', 'number', 'number']);
                 document.getElementById("genBtn").disabled = false;
                 document.getElementById("sendBtn").disabled = false;
             };
@@ -92,7 +92,7 @@
                 let bytesPerElement = Int32Array.BYTES_PER_ELEMENT;
                 let buffer = Module._malloc(typedMatrixData.length * bytesPerElement);
                 Module.HEAP32.set(typedMatrixData, buffer >> 2);
-                processMatrix(buffer, typedMatrixData.length, rows, cols);
+                processMatrix(buffer, typedMatrixData.length, cols);
                 Module._free(buffer);
             }
 
@@ -118,4 +118,5 @@ window.sendMatrixToWASM = sendMatrixToWASM;
     </script>
             </body>
             </html>
+
 
