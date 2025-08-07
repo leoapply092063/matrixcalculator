@@ -45,7 +45,7 @@
             });
                 let processMatrix;
                 Module.onRuntimeInitialized = function () {
-                processMatrix = Module.cwrap('processMatrix', null, ['number', 'number', 'number']);
+                processMatrix = Module.cwrap('processMatrix', null, ['number', 'number', 'number', 'number']);
                 document.getElementById("genBtn").disabled = false;
                 document.getElementById("sendBtn").disabled = false;
             };
