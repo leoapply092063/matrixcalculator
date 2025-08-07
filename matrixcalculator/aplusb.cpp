@@ -6,9 +6,8 @@
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
-    void processMatrix(int* matrixData, int size, int cols) {
+    void processMatrix(int* matrixData, int size, int rows, int cols) {
         int mats = size / (cols * cols);
-        int rows = cols;
 
         int* resultMatrix = new int[rows * cols];
         for(int i = 0; i < rows * cols; i++){
@@ -68,4 +67,5 @@ extern "C" {
 }
 
  
+
 
