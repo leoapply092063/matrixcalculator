@@ -279,13 +279,6 @@ function assert(condition, text) {
 
 // We used to include malloc/free by default in the past. Show a helpful error in
 // builds with assertions.
-function _malloc() {
-  abort('malloc() called but not included in the build - add `_malloc` to EXPORTED_FUNCTIONS');
-}
-function _free() {
-  // Show a helpful error since we used to include free by default in the past.
-  abort('free() called but not included in the build - add `_free` to EXPORTED_FUNCTIONS');
-}
 
 // Memory management
 
@@ -1426,9 +1419,11 @@ var wasmImports = {
 var wasmExports;
 createWasm();
 var ___wasm_call_ctors = createExportWrapper('__wasm_call_ctors', 0);
-var _processMatrix = Module['_processMatrix'] = createExportWrapper('processMatrix', 4);
+var _processMatrix = Module['_processMatrix'] = createExportWrapper('processMatrix', 3);
 var _fflush = createExportWrapper('fflush', 1);
 var _strerror = createExportWrapper('strerror', 1);
+var _malloc = Module['_malloc'] = createExportWrapper('malloc', 1);
+var _free = Module['_free'] = createExportWrapper('free', 1);
 var _emscripten_stack_init = () => (_emscripten_stack_init = wasmExports['emscripten_stack_init'])();
 var _emscripten_stack_get_free = () => (_emscripten_stack_get_free = wasmExports['emscripten_stack_get_free'])();
 var _emscripten_stack_get_base = () => (_emscripten_stack_get_base = wasmExports['emscripten_stack_get_base'])();
